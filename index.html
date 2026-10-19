@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Appearance, language and text settings that stay synchronized across browser tabs." />
+    <meta name="theme-color" content="#f6f0df" />
+    <!-- initial-preferences -->
+    <link rel="stylesheet" href="/src/tailwind.css" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Settings — SettingSync</title>
+  </head>
+  <body class="min-w-[320px] bg-cream-page font-[family-name:var(--font-family)] text-base leading-normal text-cream-ink antialiased selection:bg-cream-selection selection:text-cream-ink dark:bg-algae-page dark:text-algae-ink dark:selection:bg-algae-selection dark:selection:text-algae-ink">
+    <div id="app" hidden>
+      <div class="mx-auto w-[calc(100%-4rem)] max-w-[1000px] max-[700px]:w-[calc(100%-2.5rem)] max-[390px]:w-[calc(100%-2rem)]">
+        <main class="mx-auto mt-[3.25rem] mb-16 max-w-[780px] max-[700px]:mt-8">
+          <header class="mb-[1.6rem] flex flex-wrap items-end justify-between gap-4 max-[700px]:items-start max-[700px]:gap-[.85rem]">
+            <div>
+              <h1 class="mb-[.4rem] text-[2rem] leading-[1.2] font-[650] tracking-[-.06rem]" data-translation="title"></h1>
+              <p class="text-[.95rem] text-cream-muted dark:text-algae-muted" data-translation="description"></p>
+            </div>
+            <button id="open-tab" class="inline-flex min-h-11 cursor-pointer items-center justify-center gap-[.6rem] rounded-[.4rem] border border-cream-line-strong bg-cream-surface px-[.8rem] py-[.55rem] text-[.85rem] font-medium hover:border-cream-accent hover:text-cream-accent focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-cream-accent dark:border-algae-line-strong dark:bg-algae-surface dark:hover:border-algae-accent dark:hover:text-algae-accent dark:focus-visible:outline-algae-accent max-[390px]:px-[.6rem] max-[390px]:py-2 max-[390px]:text-[.8rem]">
+              <span data-translation="openTab"></span>
+              <svg class="size-[.95rem] shrink-0 align-middle max-[390px]:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7M21 3l-9 9"/><path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/></svg>
+            </button>
+          </header>
+          <p id="storage-warning" class="mb-5 rounded-[.4rem] border border-current px-4 py-[.8rem] text-[.85rem] text-cream-warning dark:text-algae-warning" role="status" hidden></p>
+
+          <section id="settings-panel" class="rounded-lg border border-cream-line-strong bg-cream-surface px-7 dark:border-algae-line-strong dark:bg-algae-surface max-[700px]:px-5" aria-label="Preferences">
+            <div data-setting="darkMode" class="flex min-h-30 items-center justify-between gap-8 border-b border-cream-line py-7 last:border-b-0 dark:border-algae-line max-[700px]:flex-wrap max-[700px]:gap-4 max-[700px]:py-[1.4rem]">
+              <div class="min-w-0 flex-1">
+                <label class="cursor-pointer text-base font-semibold" for="dark-mode" data-translation="darkMode"></label>
+                <p class="mt-1 text-sm leading-normal text-cream-muted dark:text-algae-muted" id="dark-mode-help" data-translation="darkModeHelp"></p>
+              </div>
+              <label class="relative flex h-11 w-[2.8rem] shrink-0 items-center">
+                <input class="peer absolute inset-0 z-10 size-full cursor-pointer opacity-0" id="dark-mode" type="checkbox" role="switch" aria-describedby="dark-mode-help">
+                <span class="h-[1.6rem] w-[2.8rem] rounded-full bg-cream-switch-off transition-colors duration-150 peer-checked:bg-cream-accent peer-focus-visible:outline-3 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-cream-accent motion-reduce:transition-none dark:bg-algae-switch-off dark:peer-checked:bg-algae-accent dark:peer-focus-visible:outline-algae-accent peer-checked:[&>span]:translate-x-[1.2rem]" aria-hidden="true">
+                  <span class="m-[.2rem] block size-[1.2rem] rounded-full bg-cream-switch-thumb shadow-[0_1px_3px_#0002] transition-transform duration-150 motion-reduce:transition-none dark:bg-algae-switch-thumb"></span>
+                </span>
+              </label>
+            </div>
+
+            <div data-setting="fontFamily" class="flex min-h-30 items-center justify-between gap-8 border-b border-cream-line py-7 last:border-b-0 dark:border-algae-line max-[700px]:flex-wrap max-[700px]:gap-4 max-[700px]:py-[1.4rem]">
+              <div class="min-w-0 flex-1 max-[700px]:basis-full">
+                <label class="cursor-pointer text-base font-semibold" for="font-family" data-translation="fontFamily"></label>
+                <p class="mt-1 text-sm leading-normal text-cream-muted dark:text-algae-muted" id="font-family-help" data-translation="fontFamilyHelp"></p>
+              </div>
+              <div class="relative w-56 shrink-0 max-[700px]:w-full">
+                <select id="font-family" class="block min-h-11 w-full cursor-pointer appearance-none rounded-[.35rem] border border-cream-control bg-cream-surface py-[.6rem] pr-[2.4rem] pl-[.8rem] text-[.95rem] text-cream-ink focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-cream-accent dark:border-algae-control dark:bg-algae-surface dark:text-algae-ink dark:focus-visible:outline-algae-accent" aria-describedby="font-family-help"></select>
+                <svg class="pointer-events-none absolute top-1/2 right-[.8rem] size-4 -translate-y-1/2 text-cream-muted dark:text-algae-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+              </div>
+            </div>
+
+            <div data-setting="language" class="flex min-h-30 items-center justify-between gap-8 border-b border-cream-line py-7 last:border-b-0 dark:border-algae-line max-[700px]:flex-wrap max-[700px]:gap-4 max-[700px]:py-[1.4rem]">
+              <div class="min-w-0 flex-1 max-[700px]:basis-full">
+                <label class="cursor-pointer text-base font-semibold" for="language" data-translation="language"></label>
+                <p class="mt-1 text-sm leading-normal text-cream-muted dark:text-algae-muted" id="language-help" data-translation="languageHelp"></p>
+              </div>
+              <div class="relative w-56 shrink-0 max-[700px]:w-full">
+                <select id="language" class="block min-h-11 w-full cursor-pointer appearance-none rounded-[.35rem] border border-cream-control bg-cream-surface py-[.6rem] pr-[2.4rem] pl-[.8rem] text-[.95rem] text-cream-ink focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-cream-accent dark:border-algae-control dark:bg-algae-surface dark:text-algae-ink dark:focus-visible:outline-algae-accent" aria-describedby="language-help"></select>
+                <svg class="pointer-events-none absolute top-1/2 right-[.8rem] size-4 -translate-y-1/2 text-cream-muted dark:text-algae-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+              </div>
+            </div>
+
+            <div data-setting="fontSize" class="flex min-h-30 items-center justify-between gap-8 border-b border-cream-line py-7 last:border-b-0 dark:border-algae-line max-[700px]:flex-wrap max-[700px]:gap-4 max-[700px]:py-[1.4rem]">
+              <div class="min-w-0 flex-1 max-[700px]:basis-full">
+                <label class="cursor-pointer text-base font-semibold" for="font-size" data-translation="typography"></label>
+                <p class="mt-1 text-sm leading-normal text-cream-muted dark:text-algae-muted" id="font-help" data-translation="typographyHelp"></p>
+              </div>
+              <div class="w-56 shrink-0 max-[700px]:w-full">
+                <div class="mb-2 flex items-center justify-between text-xs leading-normal text-cream-muted dark:text-algae-muted">
+                  <span aria-hidden="true">14px</span>
+                  <output class="text-[.95rem] font-semibold text-cream-ink tabular-nums dark:text-algae-ink" id="font-value" for="font-size">16<span class="ml-[.2rem] text-[.8rem] font-normal text-cream-muted dark:text-algae-muted">px</span></output>
+                  <span aria-hidden="true">22px</span>
+                </div>
+                <input id="font-size" type="range" min="14" max="22" step="1" value="16" aria-describedby="font-help"
+                  class="m-0 block h-6 w-full cursor-pointer appearance-none bg-transparent p-0 accent-cream-accent focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-cream-accent dark:accent-algae-accent dark:focus-visible:outline-algae-accent
+                    [--range-progress:25%] [--range-accent:var(--color-cream-accent)] [--range-surface:var(--color-cream-surface)] [--range-track:var(--color-cream-control)] dark:[--range-accent:var(--color-algae-accent)] dark:[--range-surface:var(--color-algae-surface)] dark:[--range-track:var(--color-algae-control)]
+                    [&::-webkit-slider-runnable-track]:h-[.3rem] [&::-webkit-slider-runnable-track]:rounded-2xl [&::-webkit-slider-runnable-track]:bg-[linear-gradient(to_right,var(--range-accent)_var(--range-progress),var(--range-track)_var(--range-progress))]
+                    [&::-webkit-slider-thumb]:-mt-[.375rem] [&::-webkit-slider-thumb]:size-[1.05rem] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-[.18rem] [&::-webkit-slider-thumb]:border-[var(--range-surface)] [&::-webkit-slider-thumb]:bg-[var(--range-accent)] [&::-webkit-slider-thumb]:shadow-[0_0_0_1px_var(--range-accent)]
+                    [&::-moz-range-track]:h-[.3rem] [&::-moz-range-track]:rounded-2xl [&::-moz-range-track]:bg-[var(--range-track)] [&::-moz-range-progress]:h-[.3rem] [&::-moz-range-progress]:bg-[var(--range-accent)]
+                    [&::-moz-range-thumb]:size-[.7rem] [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-[.18rem] [&::-moz-range-thumb]:border-[var(--range-surface)] [&::-moz-range-thumb]:bg-[var(--range-accent)] [&::-moz-range-thumb]:shadow-[0_0_0_1px_var(--range-accent)]">
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <noscript>This app needs JavaScript to save and sync your preferences.</noscript>
+    <script type="module">
+      import { loadSettings } from '/src/main.ts';
+      loadSettings();
+    </script>
+  </body>
+</html>
