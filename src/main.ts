@@ -1,5 +1,5 @@
-import { DEFAULT_SETTINGS, FONTS, LANGUAGES, SETTING_KEYS, STORAGE_PREFIX, translations } from './settings';
-import type { FontFamily, Language, LegacySettings, SettingKey, Settings, SettingsMessage, TranslationKey } from './settings';
+import { DEFAULT_SETTINGS, FONTS, LANGUAGES, SETTING_KEYS, translations } from './settings';
+import type { FontFamily, Language, SettingKey, Settings, SettingsMessage, TranslationKey } from './settings';
 
 let settings: Settings = { ...DEFAULT_SETTINGS };
 let channel: BroadcastChannel | null = null;
@@ -11,16 +11,21 @@ const fontFamily = document.querySelector<HTMLSelectElement>('#font-family')!;
 const language = document.querySelector<HTMLSelectElement>('#language')!;
 const fontSize = document.querySelector<HTMLInputElement>('#font-size')!;
 
-// No argument loads every preference at startup. A setting name loads only that preference.
 export function loadSettings(changedSetting?: SettingKey, unsavedValue?: unknown): void {
-  const keys = changedSetting ? [changedSetting] : SETTING_KEYS;
+  let keys;
+
+  if (changedSetting) {
+      keys = [changedSetting];
+  } else {
+      keys = SETTING_KEYS;
+  }
 
   for (const key of keys) {
     let value = unsavedValue;
     if (value === undefined) {
       let saved: string | null;
       try {
-        saved = localStorage.getItem(STORAGE_PREFIX + key);
+        saved = localStorage.getItem('preference:' + key);
       } catch {
         storageAvailable = false;
         continue;
@@ -75,7 +80,7 @@ export function loadSettings(changedSetting?: SettingKey, unsavedValue?: unknown
 
 export function storeSettings<K extends SettingKey>(key: K, value: Settings[K]): void {
   try {
-    localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+    localStorage.setItem('preference:' + key, JSON.stringify(value));
     storageAvailable = true;
   } catch {
     storageAvailable = false;
@@ -87,46 +92,12 @@ export function storeSettings<K extends SettingKey>(key: K, value: Settings[K]):
   } catch { channel = null; }
 }
 
-// One-time compatibility step for preferences saved by the older app.
-try {
-  const missing = SETTING_KEYS.filter((key) => localStorage.getItem(STORAGE_PREFIX + key) === null);
-  if (missing.length) {
-    const legacy: Partial<Record<SettingKey, LegacySettings[SettingKey]>> = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const storageKey = localStorage.key(i);
-      if (!storageKey?.startsWith('setting-sync:v1:writer:')) continue;
-      try {
-        const snapshot = JSON.parse(localStorage.getItem(storageKey) ?? 'null') as LegacySettings | null;
-        if (snapshot?.schema !== 1) continue;
-        for (const key of missing) {
-          const entry = snapshot[key];
-          if (!entry?.version || !Number.isSafeInteger(entry.version.counter) ||
-              entry.version.counter < 0 || typeof entry.version.actor !== 'string') continue;
-          const previous = legacy[key];
-          if (!previous || entry.version.counter > previous.version.counter ||
-              (entry.version.counter === previous.version.counter && entry.version.actor > previous.version.actor)) {
-            legacy[key] = entry;
-          }
-        }
-      } catch { /* Ignore a damaged old snapshot. */ }
-    }
-    for (const key of missing) {
-      if (legacy[key] && localStorage.getItem(STORAGE_PREFIX + key) === null) {
-        localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(legacy[key].value));
-      }
-    }
-  }
-} catch { /* The loader handles unavailable storage. */ }
-
-// Sets up the controls and listerners after the page is available
 if (app) {
-  fontFamily.innerHTML = Object.entries(FONTS).map(([value, font]) =>
-    `<option value="${value}">${font.name}</option>`).join('');
-  language.innerHTML = Object.entries(LANGUAGES).map(([value, name]) =>
-    `<option value="${value}" lang="${value}">${name}</option>`).join('');
+  fontFamily.innerHTML = Object.entries(FONTS).map(([value, font]) => `<option value="${value}">${font.name}</option>`).join('');
+  language.innerHTML = Object.entries(LANGUAGES).map(([value, name]) => `<option value="${value}" lang="${value}">${name}</option>`).join('');
 
   try { 
-    channel = new BroadcastChannel('my_app_channel');
+    channel = new BroadcastChannel('my_channel');
   } catch {
     channel = null;
   }
@@ -137,10 +108,8 @@ if (app) {
         for (const key of SETTING_KEYS) {
           channel?.postMessage({ type: 'SETTING_UPDATED', setting: key, value: settings[key], persisted: storageAvailable });
         }
-      } else if (message?.type === 'SETTING_UPDATED' && SETTING_KEYS.includes(message.setting) &&
-          typeof message.persisted === 'boolean') {
+      } else if (message?.type === 'SETTING_UPDATED' && SETTING_KEYS.includes(message.setting) && typeof message.persisted === 'boolean') {
         if (!message.persisted) storageAvailable = false;
-        // A message can arrive late. Read the saved value instead of trusting message order.
         loadSettings(message.setting, message.persisted ? undefined : message.value);
       }
     };
@@ -161,7 +130,7 @@ if (app) {
       loadSettings();
       return;
     }
-    const key = SETTING_KEYS.find((key) => event.key === STORAGE_PREFIX + key);
+    const key = SETTING_KEYS.find((key) => event.key === 'preference:' + key);
     if (key) loadSettings(key);
   });
   window.addEventListener('focus', () => loadSettings());

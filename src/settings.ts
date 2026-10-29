@@ -1,3 +1,4 @@
+// types of languages
 export const LANGUAGES = {
   en: 'English',
   es: 'Español',
@@ -5,6 +6,7 @@ export const LANGUAGES = {
   ja: '日本語',
 } as const;
 
+// types of fonts
 export const FONTS = {
   system: { name: 'System default', family: "'Segoe UI', 'Noto Sans', sans-serif" },
   arial: { name: 'Arial', family: 'Arial, Helvetica, sans-serif' },
@@ -16,6 +18,7 @@ export const FONTS = {
 export type Language = keyof typeof LANGUAGES;
 export type FontFamily = keyof typeof FONTS;
 
+// settings
 export interface Settings {
   darkMode: boolean;
   fontFamily: FontFamily;
@@ -30,8 +33,8 @@ export type SettingsMessage =
   | { type: 'SETTING_UPDATED'; setting: SettingKey; value: unknown; persisted: boolean };
 
 export const SETTING_KEYS: readonly SettingKey[] = ['darkMode', 'fontFamily', 'language', 'fontSize'];
-export const STORAGE_PREFIX = 'setting-sync:preference:';
 
+//defaults
 export const DEFAULT_SETTINGS: Settings = {
   darkMode: false,
   fontFamily: 'system',
@@ -39,14 +42,7 @@ export const DEFAULT_SETTINGS: Settings = {
   fontSize: 16,
 };
 
-// Used only to read preferences saved by the previous version of the app.
-export interface LegacyPreference {
-  value: unknown;
-  version: { counter: number; actor: string };
-}
-
-export type LegacySettings = { schema: 1 } & Partial<Record<SettingKey, LegacyPreference>>;
-
+// languages
 const en = {
   openTab: 'Open another tab',
   title: 'Settings',
